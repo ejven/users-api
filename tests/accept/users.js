@@ -58,4 +58,32 @@ describe('Users', function() {
       });
     });
   });
+
+  describe('/POST users', function() {
+    it('should save a user', function(done) {
+      var user = {
+        name: {
+          first: "Foo",
+          last: "Bar"
+        }
+      };
+
+      // Post user
+      chai.request(url)
+        .post('/users')
+        .send(user)
+        .end(function(err, res) {
+          res.should.have.status(200);
+          expect(res.body).to.be.a('object');
+          expect(res.body._id).to.be.a('string');
+
+          // Find a user in the DB
+          User.findOne({_id: res.body._id}, function(err, user) {
+            expect(user).to.be.a('object');
+            expect(user._id.toString()).eql(res.body._id);
+            done();
+          });
+        });
+    });
+  });
 });
